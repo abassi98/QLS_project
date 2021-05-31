@@ -1,0 +1,53 @@
+program analysis
+  use debugging
+  use quantum
+  use manybodyQS
+  implicit none
+  integer :: DD,NN,count,status,ii,jj,kk,N_lam,mm
+  logical :: debug,printer
+  double precision, dimension(:,:),allocatable :: levels,degeneration
+  double precision :: diff1,diff2
+  count=0
+
+  open(10,file="temp/debugging.txt",status='unknown')
+  read(10,*) debug, printer
+  close(10)
+  open(10,file="temp/parameters.txt",status='unknown')
+  read(10,*)  NN,DD,N_lam,kk
+  close(10)
+
+  !allocate memeory
+  allocate(levels(N_lam,kk+1),stat=status)
+  call check_allocation(status,debug,printer)
+
+  
+  !save data
+  open(10,file="data/levels_11.txt",status='old')
+  do ii=1,N_lam
+     read(10,*) (levels(ii,jj), jj=1,kk+1)
+  enddo
+  close(10)   
+
+  open(10, file="data/points.txt",status='unknown',access='append')
+  ii=1
+  diff1=0
+  
+  do while(diff1<0.01)
+     diff1=levels(ii,3)-levels(ii,2)
+     ii=ii+1
+  enddo
+  
+  jj=1
+  diff2=0
+  do while(diff2<0.01)
+     diff2=levels(jj,5)-levels(jj,4)
+     jj=jj+1
+  enddo
+  
+  write(10,*) 11,3/dble(N_lam)*(ii-2),3/dble(N_lam)*(jj-2)
+     
+           
+  close(10)
+ 
+  
+end program analysis
